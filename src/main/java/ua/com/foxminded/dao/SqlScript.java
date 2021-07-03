@@ -11,13 +11,13 @@ import ua.com.foxminded.model.Main;
 
 public class SqlScript {
 
-    public void executeScript() throws SQLException, IOException, DAOException {
-        DAOFactory daoFactory = DAOFactory.getInstance();
+    public void executeScript() throws SQLException, IOException, DaoException {
+        DaoFactory daoFactory = new DaoFactory();
         try (Connection connection = daoFactory.getConnection();
                 PreparedStatement statement = connection.prepareStatement(getSqlScript())) {
             statement.execute();
         } catch (SQLException e) {
-            throw new DAOException("Unable to execute init script", e);
+            throw new DaoException("Unable to execute init script", e);
         }
     }
 

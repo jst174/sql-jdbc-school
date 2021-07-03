@@ -13,10 +13,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import ua.com.foxminded.dao.CourseDAO;
-import ua.com.foxminded.dao.DAOFactory;
-import ua.com.foxminded.dao.GroupDAO;
-import ua.com.foxminded.dao.StudentDAO;
+import ua.com.foxminded.dao.CourseDao;
+import ua.com.foxminded.dao.DaoFactory;
+import ua.com.foxminded.dao.GroupDao;
+import ua.com.foxminded.dao.StudentDao;
 
 public class DataSourse {
 

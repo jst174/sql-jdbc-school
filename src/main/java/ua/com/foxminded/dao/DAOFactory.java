@@ -1,39 +1,54 @@
 package ua.com.foxminded.dao;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Properties;
 
-public class DAOFactory {
+public class DaoFactory {
 
-    private static final String USER = "admin";
-    private static final String PASSWORD = "1234";
-    private static final String URL = "jdbc:postgresql://localhost:5432/school";
-    private Connection connection;
+  private String host;
+  private String login;
+  private String password;
 
-    public static DAOFactory getInstance() {
-        return new DAOFactory();
-    }
-    
-    public CourseDAO getCourseDao() {
-        return new CourseDAO();
-    }
-    
-    public GroupDAO getGroupDAO() {
-        return new GroupDAO();
-    }
-    
-    public StudentDAO getStudentDAO() {
-        return new StudentDAO();
+    public CourseDao getCourseDao() {
+        return new CourseDao();
     }
 
-    public Connection getConnection() throws DAOException {
-        try {
-            connection = DriverManager.getConnection(URL, USER, PASSWORD);
-        } catch (SQLException e) {
-            throw new DAOException("No connection", e);
+    public GroupDao getGroupDAO() {
+        return new GroupDao();
+    }
+
+    public StudentDao getStudentDAO() {
+        return new StudentDao();
+    }
+
+    public StudentCoursesDao getStudentCoursesDAO() {
+        return new StudentCoursesDao();
+    }
+
+    public Connection getConnection() throws DaoException {
+        ClassLoader classLoader = getClass().getClassLoader();
+        Properties properties = new Properties();
+        try (InputStream file = classLoader.getResourceAsStream("db.properties")) {
+            properties.load(file);
+            host = properties.getProperty("db.host");
+            login = properties.getProperty("db.login");
+            password = properties.getProperty("db.password");
+            
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        return connection;
+        try {
+            Connection connection = DriverManager.getConnection(host, login, password);
+            return connection;
+        } catch (SQLException e) {
+            throw new DaoException("No connection", e);
+        }
+
     }
 
 }
