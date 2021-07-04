@@ -11,7 +11,7 @@ import ua.com.foxminded.model.Main;
 
 public class SqlScript {
 
-    public void executeScript() throws SQLException, IOException, DaoException {
+    public void executeScript() throws SQLException, DaoException {
         DaoFactory daoFactory = new DaoFactory();
         try (Connection connection = daoFactory.getConnection();
                 PreparedStatement statement = connection.prepareStatement(getSqlScript())) {

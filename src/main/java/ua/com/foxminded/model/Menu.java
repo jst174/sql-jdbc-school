@@ -5,8 +5,6 @@ import static java.lang.System.lineSeparator;
 import java.io.IOException;
 import java.util.Scanner;
 
-import ua.com.foxminded.dao.DaoException;
-
 public class Menu {
 
     public void getMenu(Admin admin) throws IOException {
@@ -26,7 +24,7 @@ public class Menu {
                     }
                 }
                 if (input.equals("b")) {
-                    System.out.println("enter of course name");
+                    System.out.println("enter course's name");
                     String courseName = scanner.nextLine();
                     for (Student student : admin.findStudentsFromCourse(courseName)) {
                         System.out.println(student.getFirstName() + " " + student.getLastName());
@@ -46,17 +44,17 @@ public class Menu {
                 }
                 if (input.equals("e")) {
                     createCoursesItems();
-                    String courseName = scanner.nextLine();
+                    int courseId = scanner.nextInt();
                     System.out.println("enter student's id");
-                    int id = scanner.nextInt();
-                    admin.addStudentToCourse(courseName, id);
+                    int studentId = scanner.nextInt();
+                    admin.addStudentToCourse(courseId, studentId);
                 }
                 if (input.equals("f")) {
-                    System.out.println("enter name of course");
+                    System.out.println("enter course's name");
                     String courseName = scanner.nextLine();
                     System.out.println("enter student's id");
-                    int id = scanner.nextInt();
-                    admin.removeStudentFromCourse(id, courseName);
+                    int studentId = scanner.nextInt();
+                    admin.removeStudentFromCourse(studentId, courseName);
                 }
                 input = scanner.nextLine();
 

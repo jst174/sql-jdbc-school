@@ -1,6 +1,5 @@
 package ua.com.foxminded.dao;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
@@ -10,9 +9,9 @@ import java.util.Properties;
 
 public class DaoFactory {
 
-  private String host;
-  private String login;
-  private String password;
+    private String host;
+    private String login;
+    private String password;
 
     public CourseDao getCourseDao() {
         return new CourseDao();
@@ -26,10 +25,6 @@ public class DaoFactory {
         return new StudentDao();
     }
 
-    public StudentCoursesDao getStudentCoursesDAO() {
-        return new StudentCoursesDao();
-    }
-
     public Connection getConnection() throws DaoException {
         ClassLoader classLoader = getClass().getClassLoader();
         Properties properties = new Properties();
@@ -38,7 +33,7 @@ public class DaoFactory {
             host = properties.getProperty("db.host");
             login = properties.getProperty("db.login");
             password = properties.getProperty("db.password");
-            
+
         } catch (IOException e) {
             e.printStackTrace();
         }
