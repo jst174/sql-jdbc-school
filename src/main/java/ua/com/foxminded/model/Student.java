@@ -3,6 +3,10 @@ package ua.com.foxminded.model;
 import java.util.HashSet;
 import java.util.Set;
 
+import ua.com.foxminded.dao.ConnectionProvider;
+import ua.com.foxminded.dao.DaoException;
+import ua.com.foxminded.dao.StudentDao;
+
 public class Student {
 
     private int id;
@@ -10,10 +14,27 @@ public class Student {
     private String firstName;
     private String lastName;
     private Set<Course> courses = new HashSet<>();
+    private ConnectionProvider connectionProvider;
+
+    public Student() {
+        connectionProvider = new ConnectionProvider();
+    }
 
     public Student(String firstName, String lastName) {
         this.firstName = firstName;
         this.lastName = lastName;
+
+    }
+
+    public void addStudent(String firstName, String lastName) throws DaoException {
+        StudentDao studentDao = new StudentDao(connectionProvider);
+        Student student = new Student(firstName, lastName);
+        studentDao.create(student);
+    }
+
+    public void deleteStudent(int id) throws DaoException {
+        StudentDao studentDao = new StudentDao(connectionProvider);
+        studentDao.delete(id);
     }
 
     @Override

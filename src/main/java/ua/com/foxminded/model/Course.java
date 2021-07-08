@@ -1,14 +1,51 @@
 package ua.com.foxminded.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import ua.com.foxminded.dao.ConnectionProvider;
+import ua.com.foxminded.dao.CourseDao;
+import ua.com.foxminded.dao.DaoException;
+import ua.com.foxminded.dao.StudentDao;
+
 public class Course {
 
     private int id;
     private String name;
     private String description;
+    private List<Student> students = new ArrayList<>();
+    private ConnectionProvider connectionProvider;
+
+    public Course() {
+        connectionProvider = new ConnectionProvider();
+    }
 
     public Course(String name, String description) {
         this.name = name;
         this.description = description;
+    }
+
+    public List<Student> findStudentsFromCourse(String courseName) throws DaoException {
+        CourseDao courseDao = new CourseDao(connectionProvider);
+        Course course = courseDao.read(courseName);
+        return course.getStudents();
+    }
+
+    public void addStudentToCourse(String courseName, int studentId) throws DaoException {
+        CourseDao courseDao = new CourseDao(connectionProvider);
+        StudentDao studentDao = new StudentDao(connectionProvider);
+        Student student = studentDao.read(studentId);
+        Course course = courseDao.read(courseName);
+        student.setCourses(course);
+        studentDao.addStudentToCourse(student);
+    }
+
+    public void removeStudentFromCourse(int studentId, String courseName) throws DaoException {
+        CourseDao courseDao = new CourseDao(connectionProvider);
+        StudentDao studentDao = new StudentDao(connectionProvider);
+        Student student = studentDao.read(studentId);
+        Course course = courseDao.read(courseName);
+        studentDao.deleteStudentFromCourse(student, course);
     }
 
     public void setId(int id) {
@@ -33,6 +70,14 @@ public class Course {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public List<Student> getStudents() {
+        return students;
+    }
+
+    public void setStudents(Student student) {
+        this.students.add(student);
     }
 
     @Override

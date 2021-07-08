@@ -16,10 +16,15 @@ public class GroupDao {
     private static final String SELECT = "select g.group_name, count(s.student_id) from "
             + "groups g left join students s on s.group_id=g.group_id "
             + "group by g.group_name having count(s.student_id)<?;";
-    private DaoFactory daoFactory = new DaoFactory();
+
+    private ConnectionProvider connectionProvider;
+
+    public GroupDao(ConnectionProvider connectionProvider) {
+        this.connectionProvider = connectionProvider;
+    }
 
     public void create(Group group) throws DaoException {
-        try (Connection connection = daoFactory.getConnection();
+        try (Connection connection = connectionProvider.getConnection();
                 PreparedStatement statement = connection.prepareStatement(INSERT, Statement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, group.getName());
             statement.executeUpdate();
@@ -34,9 +39,9 @@ public class GroupDao {
         }
     }
 
-    public List<Group> read(int count) throws DaoException {
+    public List<Group> findGroups(int count) throws DaoException {
         List<Group> groups = new ArrayList<>();
-        try (Connection connection = daoFactory.getConnection();
+        try (Connection connection = connectionProvider.getConnection();
                 PreparedStatement statement = connection.prepareStatement(SELECT, Statement.RETURN_GENERATED_KEYS)) {
             statement.setInt(1, count);
             ResultSet resultSet = statement.executeQuery();

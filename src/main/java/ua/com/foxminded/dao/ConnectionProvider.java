@@ -7,25 +7,13 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
-public class DaoFactory {
+public class ConnectionProvider {
 
     private String host;
     private String login;
     private String password;
 
-    public CourseDao getCourseDao() {
-        return new CourseDao();
-    }
-
-    public GroupDao getGroupDAO() {
-        return new GroupDao();
-    }
-
-    public StudentDao getStudentDAO() {
-        return new StudentDao();
-    }
-
-    public Connection getConnection() throws DaoException {
+    public ConnectionProvider() {
         ClassLoader classLoader = getClass().getClassLoader();
         Properties properties = new Properties();
         try (InputStream file = classLoader.getResourceAsStream("db.properties")) {
@@ -37,6 +25,9 @@ public class DaoFactory {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public Connection getConnection() throws DaoException {
         try {
             Connection connection = DriverManager.getConnection(host, login, password);
             return connection;

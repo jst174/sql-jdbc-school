@@ -21,6 +21,8 @@
         <jacoco-maven-plugin.version>0.8.6</jacoco-maven-plugin.version>
         <postgresql.version>42.2.20</postgresql.version>
         <mockito.version>3.7.7</mockito.version>
+        <dbunit.version>2.7.0</dbunit.version>
+        <h2.version>1.4.200</h2.version>
     </properties>
 
     <dependencies>
@@ -53,6 +55,20 @@
             <version>${mockito.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.dbunit</groupId>
+            <artifactId>dbunit</artifactId>
+            <version>${dbunit.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>${h2.version}</version>
+            <scope>test</scope>
+        </dependency>
+
 
     </dependencies>
 
