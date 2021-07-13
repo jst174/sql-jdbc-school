@@ -8,6 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import ua.com.foxminded.ConnectionProvider;
 import ua.com.foxminded.model.Group;
 
 public class GroupDao {
@@ -39,10 +40,10 @@ public class GroupDao {
         }
     }
 
-    public List<Group> findGroups(int count) throws DaoException {
+    public List<Group> findGroupsByStudentsCount(int count) throws DaoException {
         List<Group> groups = new ArrayList<>();
         try (Connection connection = connectionProvider.getConnection();
-                PreparedStatement statement = connection.prepareStatement(SELECT, Statement.RETURN_GENERATED_KEYS)) {
+                PreparedStatement statement = connection.prepareStatement(SELECT)) {
             statement.setInt(1, count);
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {

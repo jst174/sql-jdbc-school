@@ -9,6 +9,9 @@ import ua.com.foxminded.dao.DaoException;
 import ua.com.foxminded.model.Course;
 import ua.com.foxminded.model.Group;
 import ua.com.foxminded.model.Student;
+import ua.com.foxminded.service.CourseService;
+import ua.com.foxminded.service.GroupService;
+import ua.com.foxminded.service.StudentService;
 
 public class Menu {
 
@@ -20,9 +23,9 @@ public class Menu {
     }
 
     public void getMenu() throws DaoException {
-        Student students = new Student();
-        Group groups = new Group();
-        Course courses = new Course();
+        StudentService students = new StudentService();
+        GroupService groups = new GroupService();
+        CourseService courses = new CourseService();
         Scanner scanner = new Scanner(System.in);
         createItems();
         System.out.println("choose item");
@@ -31,13 +34,13 @@ public class Menu {
             if (input.equals("a")) {
                 System.out.println("enter the number of students");
                 int number = scanner.nextInt();
-                for (Group group : groups.findGroups(number)) {
+                for (Group group : groups.findGroupsByStudentsCount(number)) {
                     System.out.println(group.getName());
                 }
             } else if (input.equals("b")) {
-                System.out.println("enter course's name");
-                String courseName = scanner.nextLine();
-                for (Student student : courses.findStudentsFromCourse(courseName)) {
+                System.out.println("enter course's id");
+                int courseId = scanner.nextInt();
+                for (Student student : courses.findStudentsFromCourse(courseId)) {
                     System.out.println(student.getFirstName() + " " + student.getLastName());
                 }
             } else if (input.equals("c")) {
@@ -52,16 +55,16 @@ public class Menu {
                 students.deleteStudent(id);
             } else if (input.equals("e")) {
                 createCoursesItems();
-                String courseName = scanner.nextLine();
+                int courseId = scanner.nextInt();
                 System.out.println("enter student's id");
                 int studentId = scanner.nextInt();
-                courses.addStudentToCourse(courseName, studentId);
+                courses.addStudentToCourse(courseId, studentId);
             } else if (input.equals("f")) {
                 System.out.println("enter course's name");
-                String courseName = scanner.nextLine();
+                int courseId = scanner.nextInt();
                 System.out.println("enter student's id");
                 int studentId = scanner.nextInt();
-                courses.removeStudentFromCourse(studentId, courseName);
+                courses.removeStudentFromCourse(studentId, courseId);
             }
             input = scanner.nextLine();
 

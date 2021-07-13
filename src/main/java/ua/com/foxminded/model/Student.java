@@ -3,7 +3,7 @@ package ua.com.foxminded.model;
 import java.util.HashSet;
 import java.util.Set;
 
-import ua.com.foxminded.dao.ConnectionProvider;
+import ua.com.foxminded.ConnectionProvider;
 import ua.com.foxminded.dao.DaoException;
 import ua.com.foxminded.dao.StudentDao;
 
@@ -14,27 +14,11 @@ public class Student {
     private String firstName;
     private String lastName;
     private Set<Course> courses = new HashSet<>();
-    private ConnectionProvider connectionProvider;
-
-    public Student() {
-        connectionProvider = new ConnectionProvider();
-    }
 
     public Student(String firstName, String lastName) {
         this.firstName = firstName;
         this.lastName = lastName;
 
-    }
-
-    public void addStudent(String firstName, String lastName) throws DaoException {
-        StudentDao studentDao = new StudentDao(connectionProvider);
-        Student student = new Student(firstName, lastName);
-        studentDao.create(student);
-    }
-
-    public void deleteStudent(int id) throws DaoException {
-        StudentDao studentDao = new StudentDao(connectionProvider);
-        studentDao.delete(id);
     }
 
     @Override
@@ -47,7 +31,10 @@ public class Student {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
+        result = prime * result + ((courses == null) ? 0 : courses.hashCode());
         result = prime * result + ((firstName == null) ? 0 : firstName.hashCode());
+        result = prime * result + ((group == null) ? 0 : group.hashCode());
+        result = prime * result + id;
         result = prime * result + ((lastName == null) ? 0 : lastName.hashCode());
         return result;
     }
@@ -61,10 +48,22 @@ public class Student {
         if (getClass() != obj.getClass())
             return false;
         Student other = (Student) obj;
+        if (courses == null) {
+            if (other.courses != null)
+                return false;
+        } else if (!courses.equals(other.courses))
+            return false;
         if (firstName == null) {
             if (other.firstName != null)
                 return false;
         } else if (!firstName.equals(other.firstName))
+            return false;
+        if (group == null) {
+            if (other.group != null)
+                return false;
+        } else if (!group.equals(other.group))
+            return false;
+        if (id != other.id)
             return false;
         if (lastName == null) {
             if (other.lastName != null)

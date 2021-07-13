@@ -1,16 +1,19 @@
 package ua.com.foxminded;
 
-import org.dbunit.Assertion;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.dbunit.Assertion;
 import org.dbunit.DataSourceBasedDBTestCase;
+import org.dbunit.dataset.DataSetException;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.ITable;
 import org.dbunit.dataset.xml.FlatXmlDataSetBuilder;
-import org.dbunit.operation.DatabaseOperation;
 import org.h2.jdbcx.JdbcDataSource;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,12 +21,16 @@ import org.junit.jupiter.api.Test;
 
 import ua.com.foxminded.dao.CourseDao;
 import ua.com.foxminded.dao.DaoException;
+import ua.com.foxminded.dao.GroupDao;
+import ua.com.foxminded.dao.StudentDao;
 import ua.com.foxminded.model.Course;
+import ua.com.foxminded.model.Group;
+import ua.com.foxminded.model.Student;
 
-class CourseDaoTest extends DataSourceBasedDBTestCase {
+class GroupDaoTest extends DataSourceBasedDBTestCase {
 
     private ConnectionProvider connectionProvider;
-    private CourseDao courseDao;
+    private GroupDao groupDao;
 
     @Override
     protected DataSource getDataSource() {
@@ -39,12 +46,13 @@ class CourseDaoTest extends DataSourceBasedDBTestCase {
         try (InputStream resourceAsStream = getClass().getClassLoader().getResourceAsStream("data.xml")) {
             return new FlatXmlDataSetBuilder().build(resourceAsStream);
         }
+
     }
 
     @BeforeEach
-    public void setUp() throws DaoException {
+    public void setUp() {
         connectionProvider = new ConnectionProvider("db.properties");
-        courseDao = new CourseDao(connectionProvider);
+        groupDao = new GroupDao(connectionProvider);
     }
 
     @AfterEach
@@ -54,33 +62,15 @@ class CourseDaoTest extends DataSourceBasedDBTestCase {
     }
 
     @Test
-    public void create_ShouldCreateNewCourse() throws Exception {
+    public void create_ShouldCreateNewGroup() throws Exception {
         IDataSet expectedDataSet = getDataSet();
-        ITable expectedTable = expectedDataSet.getTable("COURSES");
+        ITable expectedTable = expectedDataSet.getTable("groups");
 
-        courseDao.create(new Course("History", "course of History"));
+        groupDao.create(new Group("MH-12"));
 
         IDataSet databaseDataSet = getConnection().createDataSet();
-        ITable actualTable = databaseDataSet.getTable("COURSES");
+        ITable actualTable = databaseDataSet.getTable("groups");
         Assertion.assertEquals(expectedTable, actualTable);
     }
 
-    @Test
-    public void read_ShouldReturnCourseFromDatabase() throws DaoException {
-        Course expected = new Course("History", "course of History");
-        courseDao.create(expected);
-
-        Course actual = courseDao.read(1);
-
-        assertEquals(expected, actual);
-    }
-
-    @Test
-    public void create_CourseShouldHaveStudents() throws DaoException {
-        courseDao.create(new Course("History", "course of History"));
-
-        Course course = courseDao.read(1);
-
-        assertNotNull(course.getStudents());
-    }
 }

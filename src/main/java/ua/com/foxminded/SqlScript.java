@@ -6,13 +6,12 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import ua.com.foxminded.dao.ConnectionProvider;
 import ua.com.foxminded.dao.DaoException;
 
 public class SqlScript {
 
     public void executeScript(String fileName) throws DaoException {
-        ConnectionProvider connectionProvider = new ConnectionProvider();
+        ConnectionProvider connectionProvider = new ConnectionProvider("db.properties");
         try (Connection connection = connectionProvider.getConnection();
                 PreparedStatement statement = connection.prepareStatement(getSqlScript(fileName))) {
             statement.execute();

@@ -8,6 +8,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import ua.com.foxminded.ConnectionProvider;
 import ua.com.foxminded.model.Course;
 import ua.com.foxminded.model.Student;
 
@@ -74,8 +75,7 @@ public class StudentDao {
 
     public void assignGroup(Student student) throws DaoException {
         try (Connection connection = connectionProvider.getConnection();
-                PreparedStatement statement = connection.prepareStatement(UPDATE_GROUP,
-                        Statement.RETURN_GENERATED_KEYS)) {
+                PreparedStatement statement = connection.prepareStatement(UPDATE_GROUP)) {
             statement.setInt(1, student.getGroup().getId());
             statement.setInt(2, student.getId());
             statement.executeUpdate();
@@ -88,7 +88,7 @@ public class StudentDao {
     public Student read(int studentId) throws DaoException {
         Student student = null;
         try (Connection connection = connectionProvider.getConnection();
-                PreparedStatement statement = connection.prepareStatement(SELECT, Statement.RETURN_GENERATED_KEYS)) {
+                PreparedStatement statement = connection.prepareStatement(SELECT)) {
             statement.setInt(1, studentId);
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
@@ -103,7 +103,7 @@ public class StudentDao {
 
     public void delete(int id) throws DaoException {
         try (Connection connection = connectionProvider.getConnection();
-                PreparedStatement statement = connection.prepareStatement(DELETE, Statement.RETURN_GENERATED_KEYS)) {
+                PreparedStatement statement = connection.prepareStatement(DELETE)) {
             statement.setInt(1, id);
             statement.executeUpdate();
         } catch (SQLException e) {
@@ -113,8 +113,7 @@ public class StudentDao {
 
     public void deleteStudentFromCourse(Student student, Course course) throws DaoException {
         try (Connection connection = connectionProvider.getConnection();
-                PreparedStatement statement = connection.prepareStatement(DELETE_STUDENT_FROM_COURSE,
-                        Statement.RETURN_GENERATED_KEYS)) {
+                PreparedStatement statement = connection.prepareStatement(DELETE_STUDENT_FROM_COURSE)) {
             statement.setInt(1, student.getId());
             statement.setInt(2, course.getId());
             statement.executeUpdate();

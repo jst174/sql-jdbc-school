@@ -13,7 +13,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import ua.com.foxminded.dao.ConnectionProvider;
 import ua.com.foxminded.dao.CourseDao;
 import ua.com.foxminded.dao.DaoException;
 import ua.com.foxminded.dao.GroupDao;
@@ -34,7 +33,7 @@ public class DataSourse {
     private List<Group> groups;
 
     public DataSourse() throws IOException {
-        ConnectionProvider connectionProvider = new ConnectionProvider();
+        ConnectionProvider connectionProvider = new ConnectionProvider("db.properties");
         studentDao = new StudentDao(connectionProvider);
         courseDao = new CourseDao(connectionProvider);
         groupDao = new GroupDao(connectionProvider);
@@ -67,7 +66,7 @@ public class DataSourse {
         }
     }
 
-    private void assignGroup(Student student) throws DaoException {
+    public void assignGroup(Student student) throws DaoException {
         Random random = new Random();
         Group group = groups.get(random.nextInt(groups.size()));
         student.setGroup(group);
