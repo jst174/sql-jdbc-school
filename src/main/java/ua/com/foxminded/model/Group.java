@@ -3,10 +3,6 @@ package ua.com.foxminded.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import ua.com.foxminded.ConnectionProvider;
-import ua.com.foxminded.dao.DaoException;
-import ua.com.foxminded.dao.GroupDao;
-
 public class Group {
 
     private int id;

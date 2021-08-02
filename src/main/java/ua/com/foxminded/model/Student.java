@@ -3,10 +3,6 @@ package ua.com.foxminded.model;
 import java.util.HashSet;
 import java.util.Set;
 
-import ua.com.foxminded.ConnectionProvider;
-import ua.com.foxminded.dao.DaoException;
-import ua.com.foxminded.dao.StudentDao;
-
 public class Student {
 
     private int id;

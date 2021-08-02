@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset>
+	<students student_id="1" group_id="1" first_name="Alex"
+		last_name="Brown" />
+	<students student_id="2" group_id="2" first_name="Mike"
+		last_name="King" />
+	<students student_id="3" group_id="2" first_name="John"
+		last_name="Sting" />
+	<students student_id="4" group_id="1" first_name="Robert"
+		last_name="Martin" />
+	<students student_id="5" group_id="1" first_name="Katy"
+		last_name="Miller" />
+	<students student_id="6" group_id="1" first_name="Anna"
+		last_name="Gray" />
+</dataset>

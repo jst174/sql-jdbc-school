@@ -12,75 +12,82 @@ import org.dbunit.dataset.ITable;
 import org.dbunit.dataset.xml.FlatXmlDataSetBuilder;
 import org.dbunit.operation.DatabaseOperation;
 import org.h2.jdbcx.JdbcDataSource;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
 import ua.com.foxminded.dao.CourseDao;
 import ua.com.foxminded.dao.DaoException;
 import ua.com.foxminded.model.Course;
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class CourseDaoTest extends DataSourceBasedDBTestCase {
 
-    private ConnectionProvider connectionProvider;
-    private CourseDao courseDao;
+	private ConnectionProvider connectionProvider;
+	private CourseDao courseDao;
+	private Course course;
 
-    @Override
-    protected DataSource getDataSource() {
-        JdbcDataSource dataSource = new JdbcDataSource();
-        dataSource.setURL(connectionProvider.getHost());
-        dataSource.setUser(connectionProvider.getLogin());
-        dataSource.setPassword(connectionProvider.getPassword());
-        return dataSource;
-    }
+	@Override
+	protected DataSource getDataSource() {
+		JdbcDataSource dataSource = new JdbcDataSource();
+		dataSource.setURL(
+				"jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;init=runscript from 'classpath:schemaTest.sql'");
+		dataSource.setUser("sa");
+		dataSource.setPassword("sa");
+		return dataSource;
+	}
 
-    @Override
-    protected IDataSet getDataSet() throws Exception {
-        try (InputStream resourceAsStream = getClass().getClassLoader().getResourceAsStream("data.xml")) {
-            return new FlatXmlDataSetBuilder().build(resourceAsStream);
-        }
-    }
+	@Override
+	protected IDataSet getDataSet() throws Exception {
+		try (InputStream resourceAsStream = getClass().getClassLoader().getResourceAsStream("courses.xml")) {
+			return new FlatXmlDataSetBuilder().build(resourceAsStream);
+		}
+	}
 
-    @BeforeEach
-    public void setUp() throws DaoException {
-        connectionProvider = new ConnectionProvider("db.properties");
-        courseDao = new CourseDao(connectionProvider);
-    }
+	@Override
+	protected DatabaseOperation getSetUpOperation() {
+		return DatabaseOperation.REFRESH;
+	}
 
-    @AfterEach
-    public void after() throws DaoException {
-        SqlScript sqlScript = new SqlScript();
-        sqlScript.executeScript("deleteSchema.sql");
-    }
+	@Override
+	protected DatabaseOperation getTearDownOperation() {
+		return DatabaseOperation.DELETE_ALL;
+	}
 
-    @Test
-    public void create_ShouldCreateNewCourse() throws Exception {
-        IDataSet expectedDataSet = getDataSet();
-        ITable expectedTable = expectedDataSet.getTable("COURSES");
+	@BeforeAll
+	public void setUp() throws Exception {
+		connectionProvider = new ConnectionProvider("db.properties");
+		courseDao = new CourseDao(connectionProvider);
+		course = new Course("History", "course of History");
+	}
 
-        courseDao.create(new Course("History", "course of History"));
+	@AfterAll
+	public void tearDown() throws Exception {
+		super.tearDown();
+	}
 
-        IDataSet databaseDataSet = getConnection().createDataSet();
-        ITable actualTable = databaseDataSet.getTable("COURSES");
-        Assertion.assertEquals(expectedTable, actualTable);
-    }
+	@Test
+	public void create_ShouldCreateNewCourseIntoDatabase() throws Exception {
+		IDataSet expectedDataSet = getDataSet();
+		ITable expectedTable = expectedDataSet.getTable("courses");
 
-    @Test
-    public void read_ShouldReturnCourseFromDatabase() throws DaoException {
-        Course expected = new Course("History", "course of History");
-        courseDao.create(expected);
+		courseDao.create(course);
 
-        Course actual = courseDao.read(1);
+		ITable actualData = getConnection().createQueryTable("result",
+				"SELECT*FROM COURSES WHERE course_name='History'");
 
-        assertEquals(expected, actual);
-    }
+		String[] ignore = { "course_id" };
+		Assertion.assertEqualsIgnoreCols(expectedTable, actualData, ignore);
+	}
 
-    @Test
-    public void create_CourseShouldHaveStudents() throws DaoException {
-        courseDao.create(new Course("History", "course of History"));
+	@Test
+	public void read_ShouldReturnCourseFromDatabase() throws DaoException {
+		Course expectedCourse = course;
 
-        Course course = courseDao.read(1);
+		Course actualCourse = courseDao.read(1);
 
-        assertNotNull(course.getStudents());
-    }
+		assertEquals(expectedCourse, actualCourse);
+	}
+
 }

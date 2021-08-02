@@ -21,7 +21,7 @@ import ua.com.foxminded.model.Course;
 import ua.com.foxminded.model.Group;
 import ua.com.foxminded.model.Student;
 
-public class DataSourse {
+public class DataSource {
 
     private static final char HYPHEN = '-';
 
@@ -32,11 +32,10 @@ public class DataSourse {
     private List<Student> students;
     private List<Group> groups;
 
-    public DataSourse() throws IOException {
-        ConnectionProvider connectionProvider = new ConnectionProvider("db.properties");
-        studentDao = new StudentDao(connectionProvider);
-        courseDao = new CourseDao(connectionProvider);
-        groupDao = new GroupDao(connectionProvider);
+    public DataSource(StudentDao studentDao, CourseDao courseDao, GroupDao groupDao) throws IOException {
+        this.studentDao = studentDao;
+        this.groupDao = groupDao;
+        this.courseDao = courseDao;
         courses = getCourses("courses.txt");
         students = new ArrayList<>(getStudents("firstName.txt", "lastName.txt"));
         groups = getGroups();

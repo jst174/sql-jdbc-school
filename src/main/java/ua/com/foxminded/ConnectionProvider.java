@@ -34,19 +34,4 @@ public class ConnectionProvider {
     public Connection getConnection() throws SQLException {
         return DriverManager.getConnection(host, login, password);
     }
-
-    public String getHost() {
-        return host;
-    }
-
-    public String getLogin() {
-        return login;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-    
-    
-
 }

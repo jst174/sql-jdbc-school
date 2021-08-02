@@ -5,18 +5,15 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
 
 import ua.com.foxminded.ConnectionProvider;
 import ua.com.foxminded.model.Course;
-import ua.com.foxminded.model.Student;
 
 public class CourseDao {
 
-    private static final String INSERT = "insert into courses (course_name, course_description) values (?,?)";
-    private static final String SELECT = "select * from courses where course_id = ?";
-    private static final String SELECT_STUDENTS_ID = "select student_id from student_courses where course_id = ?";
+    private static final String INSERT_NEW_COURSE = "insert into courses (course_name, course_description) values (?,?)";
+    private static final String SELECT_COURSE_BY_ID = "select * from courses where course_id = ?";
+
     private ConnectionProvider connectionProvider;
 
     public CourseDao(ConnectionProvider connectionProvider) {
@@ -24,9 +21,9 @@ public class CourseDao {
     }
 
     public void create(Course course) throws DaoException {
-
         try (Connection connection = connectionProvider.getConnection();
-                PreparedStatement statement = connection.prepareStatement(INSERT, Statement.RETURN_GENERATED_KEYS)) {
+                PreparedStatement statement = connection.prepareStatement(INSERT_NEW_COURSE,
+                        Statement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, course.getName());
             statement.setString(2, course.getDescription());
             statement.executeUpdate();
@@ -42,9 +39,8 @@ public class CourseDao {
 
     public Course read(int id) throws DaoException {
         Course course = null;
-        StudentDao studentDao = new StudentDao(connectionProvider);
         try (Connection connection = connectionProvider.getConnection();
-                PreparedStatement statement = connection.prepareStatement(SELECT)) {
+                PreparedStatement statement = connection.prepareStatement(SELECT_COURSE_BY_ID)) {
             statement.setInt(1, id);
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
@@ -53,31 +49,11 @@ public class CourseDao {
                 course = new Course(name, description);
                 course.setId(resultSet.getInt("course_id"));
             }
-            for (int studentId : getStudentsIdFromCourse(course)) {
-                Student student = studentDao.read(studentId);
-                course.setStudents(student);
-            }
 
         } catch (SQLException e) {
             throw new DaoException("Error reading", e);
         }
         return course;
-    }
-
-    private List<Integer> getStudentsIdFromCourse(Course course) throws DaoException {
-        try (Connection connection = connectionProvider.getConnection();
-                PreparedStatement statement = connection.prepareStatement(SELECT_STUDENTS_ID)) {
-            List<Integer> studentsId = new ArrayList<>();
-            statement.setInt(1, course.getId());
-            ResultSet resultSet2 = statement.executeQuery();
-            while (resultSet2.next()) {
-                studentsId.add(resultSet2.getInt("student_id"));
-            }
-            return studentsId;
-
-        } catch (SQLException e) {
-            throw new DaoException("Error reading", e);
-        }
     }
 
 }

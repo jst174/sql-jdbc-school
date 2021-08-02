@@ -17,14 +17,14 @@ public class StudentDao {
     private static final String INSERT_STUDENT = "insert into students ( group_id, first_name, last_name) values (null,?,?)";
     private static final String INSERT_STUDENT_AND_COURSE = "insert into student_courses(student_id, course_id) "
             + "values((select student_id from students where student_id=?),(select course_id from courses where course_id=?))";
-    private static final String SELECT = "select * from students where student_id=?";
-    private static final String SELECT_STUDENT_ID = "select student_id from student_courses where course_id=?";
-    private static final String UPDATE_GROUP = "update students set group_id=? where student_id=?";
-    private static final String DELETE = "delete from students where student_id=?";
+    private static final String SELECT_STUDENT_BY_ID = "select * from students where student_id=?";
+    private static final String SELECT_STUDENTS_BY_COURSE = "select student_id from student_courses where course_id = ?";
+    private static final String UPDATE_GROUP_FOR_STUDENT = "update students set group_id=? where student_id=?";
+    private static final String DELETE_STUDENT_BY_ID = "delete from students where student_id=?";
     private static final String DELETE_STUDENT_FROM_COURSE = "delete from student_courses where student_id=? and course_id=?";
 
     private ConnectionProvider connectionProvider;
-    
+
     public StudentDao(ConnectionProvider connectionProvider) {
         this.connectionProvider = connectionProvider;
     }
@@ -41,16 +41,17 @@ public class StudentDao {
             try (ResultSet resultSet = statement.getGeneratedKeys()) {
                 if (resultSet.next()) {
                     student.setId(resultSet.getInt(1));
+                    List<Course> courses = new ArrayList<>(student.getCourses());
+                    for (Course course : courses) {
+                        statement2.setInt(1, student.getId());
+                        statement2.setInt(2, course.getId());
+                        statement2.addBatch();
+                    }
+                    statement2.executeBatch();
+                    connection.commit();
                 }
             }
-            List<Course> courses = new ArrayList<>(student.getCourses());
-            for (Course course : courses) {
-                statement2.setInt(1, student.getId());
-                statement2.setInt(2, course.getId());
-                statement2.addBatch();
-            }
-            statement2.executeBatch();
-            connection.commit();
+
         } catch (SQLException e) {
             throw new DaoException();
         }
@@ -75,7 +76,7 @@ public class StudentDao {
 
     public void assignGroup(Student student) throws DaoException {
         try (Connection connection = connectionProvider.getConnection();
-                PreparedStatement statement = connection.prepareStatement(UPDATE_GROUP)) {
+                PreparedStatement statement = connection.prepareStatement(UPDATE_GROUP_FOR_STUDENT)) {
             statement.setInt(1, student.getGroup().getId());
             statement.setInt(2, student.getId());
             statement.executeUpdate();
@@ -88,7 +89,7 @@ public class StudentDao {
     public Student read(int studentId) throws DaoException {
         Student student = null;
         try (Connection connection = connectionProvider.getConnection();
-                PreparedStatement statement = connection.prepareStatement(SELECT)) {
+                PreparedStatement statement = connection.prepareStatement(SELECT_STUDENT_BY_ID)) {
             statement.setInt(1, studentId);
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
@@ -103,7 +104,7 @@ public class StudentDao {
 
     public void delete(int id) throws DaoException {
         try (Connection connection = connectionProvider.getConnection();
-                PreparedStatement statement = connection.prepareStatement(DELETE)) {
+                PreparedStatement statement = connection.prepareStatement(DELETE_STUDENT_BY_ID)) {
             statement.setInt(1, id);
             statement.executeUpdate();
         } catch (SQLException e) {
@@ -121,6 +122,24 @@ public class StudentDao {
         } catch (SQLException e) {
             throw new DaoException();
         }
+    }
+
+    public List<Student> findAllByCourse(Course course) throws DaoException {
+        try (Connection connection = connectionProvider.getConnection();
+                PreparedStatement statement = connection.prepareStatement(SELECT_STUDENTS_BY_COURSE)) {
+            statement.setInt(1, course.getId());
+            ResultSet resultSet = statement.executeQuery();
+            List<Student> students = new ArrayList<>();
+            while (resultSet.next()) {
+                Student student = read(resultSet.getInt("student_id"));
+                students.add(student);
+            }
+            return students;
+
+        } catch (SQLException e) {
+            throw new DaoException("Error reading", e);
+        }
+
     }
 
 }
