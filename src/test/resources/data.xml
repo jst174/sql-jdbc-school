@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset>
+    <COURSES COURSE_ID="1" COURSE_NAME="History"
+        COURSE_DESCRIPTION="course of History" />
+    <groups group_id="1" group_name="MH-12" />
+</dataset>
